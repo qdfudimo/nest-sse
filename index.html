@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>SSE Demo</h1>
+    <button id="btn">建立 SSE 连接</button>
+    <button onclick="closeSSE()">断开 SSE 连接</button>
+    <br />
+    <br />
+    <div id="message"></div>
+    ​
+    <script>
+        const messageElement = document.getElementById('message')
+        const btn = document.getElementById("btn")
+
+        let eventSource
+        btn.addEventListener("click", connectSSE);
+        // 建立 SSE 连接
+        function connectSSE(params) {
+            eventSource = new EventSource('http://127.0.0.1:3000/sse');
+            // 监听消息事件
+            eventSource.addEventListener('message', (event) => {
+                console.log(event);
+                // const data = JSON.parse(event.data)
+                // // 服务端推送的数据
+                // console.log(data, '######')
+                messageElement.innerHTML += `${event.data}` + '<br />'
+            });
+            eventSource.onopen = () => {
+                messageElement.innerHTML += `SSE 连接成功，状态${eventSource.readyState}<br />`
+            };
+            eventSource.onerror = () => {
+                messageElement.innerHTML += `SSE 连接错误，状态${eventSource.readyState}<br />`
+            }
+        }
+        // 断开 SSE 连接
+        closeSSE = () => {
+            eventSource.close()
+            messageElement.innerHTML += `SSE 连接关闭，状态${eventSource.readyState}<br />`
+        }
+    </script>
+</body>
+
+</html>
